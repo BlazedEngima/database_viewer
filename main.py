@@ -2,28 +2,34 @@ import tkinter as tk
 from datetime import date
 from dateutil import relativedelta
 
-
 class MainForm:
+    # Constructor of Main Form
     def __init__(self, window=None, tableFrame=None, buttonFrame=None, employeeList=[], start_p=0):
+        # Widget frames and data to be displayed
         self.dtmToday = date.today()
         self.employeeList = employeeList
-        self.start_p = start_p
+        self.start_p = start_p # Starting pointer to where the current display is on the employeeList
         self.window = window
         self.tableFrame = tableFrame
         self.buttonFrame = buttonFrame
 
+        # Set, constant values such as table headers, width, and button icons
         self.headers = ['NO', 'ID', 'NAME', 'BIRTHDAY', 'AGE']
         self.width = [5, 15, 25, 20, 30]
         self.button_icon = ['|<', '<<', '<', '>', '>>', '>|']
-        self.button_dict = {}
-        self.label_dict = {}
-
         self.data_alignment = ['e', 'w', 'w', 'center', 'center']
         self.rows, self.cols = 5, 5
 
+        # Button and label dictionaries for storage
+        self.button_dict = {}
+        self.label_dict = {}
+
+    # Initialize Buttons
     def _init_buttonFrame(self):
+        # Jump distance based on the button clicked
         jump_distance = [-len(self.employeeList), -5, -1, 1, 5, len(self.employeeList)]
 
+        # Create buttons and map them to appropriate functions
         for i in range(6):
             name = self.button_icon[i]
             distance = jump_distance[i]
@@ -40,7 +46,9 @@ class MainForm:
         
         self.buttonFrame.pack(fill='x', padx=10, pady=20)
 
+    # Initialize Table
     def _init_tableFrame(self):
+        # Create labels for columns
         for col, header in enumerate(self.headers):
             label = tk.Label(
                             self.tableFrame,
@@ -54,6 +62,7 @@ class MainForm:
 
             label.grid(row=0, column=col)
         
+        # Create labels for every cell in the table
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
@@ -74,44 +83,56 @@ class MainForm:
 
         self.tableFrame.pack(fill='x', padx=10)
 
+    # Update the table label text contents
     def _update(self):
+        # Change every entry following employeeList
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
                 self.label_dict[(i, j)]['text'] = text_val
                 
+    # Function to get data for the appropriate cells
     def _get_column_data(self, i, j):
+        # Returns data for No column
         if j == 0:
             return str(self.start_p + i + 1)
 
+        # Returns data for Age column by subtracting current date with dob
         elif j == 4:
             birth_date = self.employeeList[self.start_p + i][3]
             delta = relativedelta.relativedelta(self.dtmToday, birth_date)
 
             return f'{delta.years} Year {delta.months} Month {delta.days} Day' 
 
+        # Return data from employee instance by indexing
         return self.employeeList[self.start_p + i][j]
 
+    # Function that moves the pointer that indicates which employee in the employeeList to display
     def _move_pointer(self, value):
+        # Boundary checking
         if self.start_p + value <= 0:
             self.start_p = 0
 
         elif self.start_p + value + 5 >= len(self.employeeList):
             self.start_p = len(self.employeeList) - 5
         
+        # Add the value
         else:
             self.start_p += value
 
+    # Wrapper function to map for buttons
     def _button_function(self, value):
         self._move_pointer(value=value)
         self._update()
 
+    # Function to highlight widget element that is being hovered
     def _widget_change(self, widget, color):
         if type(widget) == tk.Button:
             widget.config(fg = color)
         elif type(widget) == tk.Label:
             widget.config(bg = color)
 
+    # Function that binds mouse hovering events above widget to the previous function to change its color
     def _init_bindings(self):
         for button in self.button_dict.values():
             button.bind('<Enter>', lambda event, widget=button, color='red': self._widget_change(widget=widget, color=color))
@@ -121,25 +142,25 @@ class MainForm:
             label.bind('<Enter>', lambda event, widget=label, color='#D3D3D3': self._widget_change(widget=widget, color=color))
             label.bind('<Leave>', lambda event, widget=label, color='white': self._widget_change(widget=widget, color=color))
 
+    # Function to add more employees to the employeeList
     def add(self, employeeData):
         self.employeeList.append(employeeData)
 
+    # Initalize function for the main window
     def win_initialize(self):
         self.window.geometry("840x240")
         self.window.title("Main")
 
-        curr_date = tk.Label(self.window, text=date.today(), font=('Arial Bold', 10))
+        curr_date = tk.Label(self.window, text=self.dtmToday, font=('Arial Bold', 10))
         curr_date.pack(padx=10, pady=10, anchor='w')
         
+    # Initalize function for the table and button UI 
     def initialize_ui(self):
         self._init_tableFrame()
         self._init_buttonFrame()
         self._init_bindings()
 
-    def button_commands(self, value):
-        self._move_pointer(value)
-        self._update()
-
+    # Initialize employee data
     def initialize_data(self):
         self.add(EmployeeData("BDI-001", "Ethan Thompson", date(2006, 10, 23)));
         self.add(EmployeeData("BDI-002", "Ava Williams", date(2010, 11, 26)));
@@ -265,16 +286,14 @@ class MainForm:
         self.add(EmployeeData("BDI-122", "Olivia Carter", date(2001, 8, 19)));
         self.add(EmployeeData("BDI-123", "Alexander Turner", date(2004, 9, 21)));
 
-    #Test function
-    def display(self):
-        print(self.employeeList[0][3])
-
 class EmployeeData:
+    # Constructor for employee instance
     def __init__(self, szId = '', szName = '', dtmBirthday = date.min):
         self.szId = szId
         self.szName = szName
         self.dtmBirthday = dtmBirthday
 
+    # Overloading the indexing function to easily access data fields of employee
     def __getitem__(self, index):
         if index == 1:
             return self.szId
@@ -285,14 +304,8 @@ class EmployeeData:
         
         return IndexError
             
+# Main driver code
 if __name__ == '__main__':
-    test_data = [(1,'Raj','Mumbai',19, 30),
-       (2,'Aaryan','Pune',18, 30),
-       (3,'Vaishnavi','Mumbai',20, 30),
-       (4,'Rachna','Mumbai',21, 30),
-       (5,'Shubham','Delhi',21, 30)]
-
-
     root = tk.Tk()
 
     tableFrame, buttonFrame = tk.Frame(root), tk.Frame(root)
