@@ -17,6 +17,7 @@ class MainForm:
         self.button_icon = ['|<', '<<', '<', '>', '>>', '>|']
         self.jump_distance = [-len(self.employeeList), -5, -1, 1, 5, len(self.employeeList)]
         self.data_alignment = ['e', 'w', 'w', 'center', 'center']
+        self.rows, self.cols = 5, 5
 
     def __init_buttonFrame__(self):
         for i in range(6):
@@ -30,11 +31,11 @@ class MainForm:
             label = tk.Label(self.tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
             label.grid(row=0, column=col)
 
-    def __update__(self):
-        rows, cols = 5, 5
+        self.tableFrame.pack(fill='x', padx=10)
 
-        for i in range(rows):
-            for j in range(cols):
+    def __update__(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
                 text_val = self.__get_column_data__(i, j)
                 entry = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
                 entry.grid(row=i + 1, column=j, sticky='nsew')
@@ -63,6 +64,10 @@ class MainForm:
         else:
             self.start_p += value
 
+    def __button_function__(self, value):
+        self.__move_pointer__(value=value)
+        self.__update__()
+
     def add(self, employeeData):
         self.employeeList.append(employeeData)
 
@@ -74,15 +79,13 @@ class MainForm:
         curr_date.pack(padx=10, pady=10, anchor='w')
         
     def initialize_ui(self):
+        self.__init_tableFrame__()
         self.__update__()
         self.__init_buttonFrame__()
 
     def button_commands(self, value):
         self.__move_pointer__(value)
         self.__update__()
-    #Test function
-    def display(self):
-        print(self.employeeList[0][3])
 
     def initialize_data(self):
         self.add(EmployeeData("BDI-001", "Ethan Thompson", date(2006, 10, 23)));
@@ -209,6 +212,9 @@ class MainForm:
         self.add(EmployeeData("BDI-122", "Olivia Carter", date(2001, 8, 19)));
         self.add(EmployeeData("BDI-123", "Alexander Turner", date(2004, 9, 21)));
 
+    #Test function
+    def display(self):
+        print(self.employeeList[0][3])
 
 class EmployeeData:
     def __init__(self, szId = '', szName = '', dtmBirthday = date.min):
