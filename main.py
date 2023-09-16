@@ -15,34 +15,46 @@ class MainForm:
         self.headers = ['NO', 'ID', 'NAME', 'BIRTHDAY', 'AGE']
         self.width = [5, 15, 25, 20, 30]
         self.button_icon = ['|<', '<<', '<', '>', '>>', '>|']
-        self.jump_distance = [-len(self.employeeList), -5, -1, 1, 5, len(self.employeeList)]
+        self.button_dict = {}
+        self.label_dict = {}
+
         self.data_alignment = ['e', 'w', 'w', 'center', 'center']
         self.rows, self.cols = 5, 5
 
-    def __init_buttonFrame__(self):
+    def _init_buttonFrame(self):
+        jump_distance = [-len(self.employeeList), -5, -1, 1, 5, len(self.employeeList)]
+
         for i in range(6):
-            button = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10))
-            button.grid(row=0, column=i)
+            name = self.button_icon[i]
+            distance = jump_distance[i]
+
+            def action(x = distance):
+                return self._button_function(x)
+
+            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=action)
+            self.button_dict[name].grid(row=0, column=i)
         
         self.buttonFrame.pack(fill='x', padx=10, pady=20)
 
-    def __init_tableFrame__(self):
+    def _init_tableFrame(self):
         for col, header in enumerate(self.headers):
             label = tk.Label(self.tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
             label.grid(row=0, column=col)
+        
+        for i in range(self.rows):
+            for j in range(self.cols):
+                text_val = self._get_column_data(i, j)
+                entry = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                entry.grid(row=i + 1, column=j, sticky='nsew')
 
         self.tableFrame.pack(fill='x', padx=10)
 
-    def __update__(self):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                text_val = self.__get_column_data__(i, j)
-                entry = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
-                entry.grid(row=i + 1, column=j, sticky='nsew')
+    def _update(self):
+
         
         self.tableFrame.pack(fill='x', padx=10)
 
-    def __get_column_data__(self, i, j):
+    def _get_column_data(self, i, j):
         if j == 0:
             return str(self.start_p + i + 1)
 
@@ -54,7 +66,7 @@ class MainForm:
 
         return self.employeeList[self.start_p + i][j]
 
-    def __move_pointer__(self, value):
+    def _move_pointer(self, value):
         if self.start_p + value <= 0:
             self.start_p = 0
 
@@ -64,9 +76,11 @@ class MainForm:
         else:
             self.start_p += value
 
-    def __button_function__(self, value):
-        self.__move_pointer__(value=value)
-        self.__update__()
+        # print(f'start: {self.start_p} value: {value}')
+
+    def _button_function(self, value):
+        self._move_pointer(value=value)
+        self._update()
 
     def add(self, employeeData):
         self.employeeList.append(employeeData)
@@ -79,13 +93,12 @@ class MainForm:
         curr_date.pack(padx=10, pady=10, anchor='w')
         
     def initialize_ui(self):
-        self.__init_tableFrame__()
-        self.__update__()
-        self.__init_buttonFrame__()
+        self._init_tableFrame()
+        self._init_buttonFrame()
 
     def button_commands(self, value):
-        self.__move_pointer__(value)
-        self.__update__()
+        self._move_pointer(value)
+        self._update()
 
     def initialize_data(self):
         self.add(EmployeeData("BDI-001", "Ethan Thompson", date(2006, 10, 23)));
