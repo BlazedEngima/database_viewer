@@ -2,43 +2,46 @@ import tkinter as tk
 from datetime import date
 from dateutil import relativedelta
 
+
 class MainForm:
-    def __init__(self, window=None, employeeList=[], start_p=0):
+    def __init__(self, window=None, tableFrame=None, buttonFrame=None, employeeList=[], start_p=0):
         self.dtmToday = date.today()
         self.employeeList = employeeList
         self.start_p = start_p
         self.window = window
+        self.tableFrame = tableFrame
+        self.buttonFrame = buttonFrame
+
         self.headers = ['NO', 'ID', 'NAME', 'BIRTHDAY', 'AGE']
         self.width = [5, 15, 25, 20, 30]
         self.button_icon = ['|<', '<<', '<', '>', '>>', '>|']
+        self.jump_distance = [-len(self.employeeList), -5, -1, 1, 5, len(self.employeeList)]
         self.data_alignment = ['e', 'w', 'w', 'center', 'center']
 
     def __init_buttonFrame__(self):
-        buttonFrame = tk.Frame(self.window)
-
         for i in range(6):
-            button = tk.Button(buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10))
+            button = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10))
             button.grid(row=0, column=i)
         
-        buttonFrame.pack(fill='x', padx=10, pady=20)
+        self.buttonFrame.pack(fill='x', padx=10, pady=20)
 
-    def update(self):
-        rows, cols = 5, 5
-        tableFrame = tk.Frame(self.window)
-        
+    def __init_tableFrame__(self):
         for col, header in enumerate(self.headers):
-            label = tk.Label(tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
+            label = tk.Label(self.tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
             label.grid(row=0, column=col)
-        
+
+    def __update__(self):
+        rows, cols = 5, 5
+
         for i in range(rows):
             for j in range(cols):
-                text_val = self.get_column_data(i, j)
-                entry = tk.Label(tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                text_val = self.__get_column_data__(i, j)
+                entry = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
                 entry.grid(row=i + 1, column=j, sticky='nsew')
         
-        tableFrame.pack(fill='x', padx=10)
+        self.tableFrame.pack(fill='x', padx=10)
 
-    def get_column_data(self, i, j):
+    def __get_column_data__(self, i, j):
         if j == 0:
             return str(self.start_p + i + 1)
 
@@ -50,14 +53,18 @@ class MainForm:
 
         return self.employeeList[self.start_p + i][j]
 
+    def __move_pointer__(self, value):
+        if self.start_p + value <= 0:
+            self.start_p = 0
+
+        elif self.start_p + value >= len(self.employeeList):
+            self.start_p = len(self.employeeList) - 1 - 5
+        
+        else:
+            self.start_p += value
+
     def add(self, employeeData):
         self.employeeList.append(employeeData)
-
-    def add_ui_data(self, uiElement):
-        self.uiList.append(uiElement)
-
-    def remove_ui_data(self, index):
-        self.uiList[index] = None
 
     def win_initialize(self):
         self.window.geometry("840x240")
@@ -67,9 +74,12 @@ class MainForm:
         curr_date.pack(padx=10, pady=10, anchor='w')
         
     def initialize_ui(self):
-        self.update()
+        self.__update__()
         self.__init_buttonFrame__()
 
+    def button_commands(self, value):
+        self.__move_pointer__(value)
+        self.__update__()
     #Test function
     def display(self):
         print(self.employeeList[0][3])
@@ -216,14 +226,6 @@ class EmployeeData:
         
         return IndexError
             
-class UIData:
-    def __init__(self, lblNo='', lblId = '', lblName ='', lblBirthday = '', lblAge = ''):
-        self.lblNo = lblNo
-        self.lblId = lblId
-        self.lblName = lblName
-        self.lblBirthday = lblBirthday
-        self.lblAge = lblAge
-
 if __name__ == '__main__':
     test_data = [(1,'Raj','Mumbai',19, 30),
        (2,'Aaryan','Pune',18, 30),
@@ -234,11 +236,11 @@ if __name__ == '__main__':
 
     root = tk.Tk()
 
-    window = MainForm(root)
+    tableFrame, buttonFrame = tk.Frame(root), tk.Frame(root)
+    window = MainForm(window=root, tableFrame=tableFrame, buttonFrame=buttonFrame)
+
     window.win_initialize()
     window.initialize_data()
     window.initialize_ui()
-    window.display()
-
 
     root.mainloop()
