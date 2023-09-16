@@ -1,11 +1,12 @@
 import tkinter as tk
 from datetime import date
+from dateutil import relativedelta
 
 class MainForm:
-    def __init__(self, window, employeeList = [], uiList = [None] * 5):
+    def __init__(self, window=None, employeeList=[], start_p=0):
         self.dtmToday = date.today()
         self.employeeList = employeeList
-        self.uiList = uiList
+        self.start_p = start_p
         self.window = window
         self.headers = ['NO', 'ID', 'NAME', 'BIRTHDAY', 'AGE']
         self.width = [5, 15, 25, 20, 30]
@@ -21,7 +22,7 @@ class MainForm:
         
         buttonFrame.pack(fill='x', padx=10, pady=20)
 
-    def __init_tableFrame__(self):
+    def update(self):
         rows, cols = 5, 5
         tableFrame = tk.Frame(self.window)
         
@@ -31,12 +32,25 @@ class MainForm:
         
         for i in range(rows):
             for j in range(cols):
-                entry = tk.Label(tableFrame, text=test_data[i][j], borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                text_val = self.get_column_data(i, j)
+                entry = tk.Label(tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
                 entry.grid(row=i + 1, column=j, sticky='nsew')
         
         tableFrame.pack(fill='x', padx=10)
 
-    def add_employee(self, employeeData):
+    def get_column_data(self, i, j):
+        if j == 0:
+            return str(self.start_p + i + 1)
+
+        elif j == 4:
+            birth_date = self.employeeList[self.start_p + i][3]
+            delta = relativedelta.relativedelta(self.dtmToday, birth_date)
+
+            return f'{delta.years} Year {delta.months} Month {delta.days} Day' 
+
+        return self.employeeList[self.start_p + i][j]
+
+    def add(self, employeeData):
         self.employeeList.append(employeeData)
 
     def add_ui_data(self, uiElement):
@@ -53,13 +67,12 @@ class MainForm:
         curr_date.pack(padx=10, pady=10, anchor='w')
         
     def initialize_ui(self):
-        self.__init_tableFrame__()
+        self.update()
         self.__init_buttonFrame__()
 
     #Test function
     def display(self):
-        print(self.employeeList)
-        print(self.uiList)
+        print(self.employeeList[0][3])
 
     def initialize_data(self):
         self.add(EmployeeData("BDI-001", "Ethan Thompson", date(2006, 10, 23)));
@@ -186,12 +199,23 @@ class MainForm:
         self.add(EmployeeData("BDI-122", "Olivia Carter", date(2001, 8, 19)));
         self.add(EmployeeData("BDI-123", "Alexander Turner", date(2004, 9, 21)));
 
+
 class EmployeeData:
     def __init__(self, szId = '', szName = '', dtmBirthday = date.min):
         self.szId = szId
         self.szName = szName
         self.dtmBirthday = dtmBirthday
-    
+
+    def __getitem__(self, index):
+        if index == 1:
+            return self.szId
+        if index == 2:
+            return self.szName
+        if index == 3:
+            return self.dtmBirthday
+        
+        return IndexError
+            
 class UIData:
     def __init__(self, lblNo='', lblId = '', lblName ='', lblBirthday = '', lblAge = ''):
         self.lblNo = lblNo
@@ -199,7 +223,6 @@ class UIData:
         self.lblName = lblName
         self.lblBirthday = lblBirthday
         self.lblAge = lblAge
-
 
 if __name__ == '__main__':
     test_data = [(1,'Raj','Mumbai',19, 30),
@@ -213,6 +236,9 @@ if __name__ == '__main__':
 
     window = MainForm(root)
     window.win_initialize()
+    window.initialize_data()
     window.initialize_ui()
+    window.display()
+
 
     root.mainloop()
