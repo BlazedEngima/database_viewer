@@ -28,20 +28,48 @@ class MainForm:
             name = self.button_icon[i]
             distance = jump_distance[i]
 
-            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=lambda distance=distance: self._button_function(value=distance))
+            self.button_dict[name] = tk.Button(
+                                            self.buttonFrame,
+                                            text=self.button_icon[i],
+                                            width=5,
+                                            font=('Arial bold', 10),
+                                            command=lambda distance=distance: self._button_function(value=distance)
+                                        )
+
             self.button_dict[name].grid(row=0, column=i)
         
         self.buttonFrame.pack(fill='x', padx=10, pady=20)
 
     def _init_tableFrame(self):
         for col, header in enumerate(self.headers):
-            label = tk.Label(self.tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
+            label = tk.Label(
+                            self.tableFrame,
+                            text=header,
+                            borderwidth=1,
+                            width=self.width[col],
+                            relief="solid",
+                            font=('Arial bold', 10),
+                            padx=5
+                        )
+
             label.grid(row=0, column=col)
         
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
-                self.label_dict[(i, j)] = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], bg='white', padx=5)
+
+                self.label_dict[(i, j)] = tk.Label(
+                                                    self.tableFrame,
+                                                    text=text_val,
+                                                    borderwidth=1,
+                                                    width=self.width[j],
+                                                    relief="solid",
+                                                    font=('Arial', 10),
+                                                    anchor=self.data_alignment[j],
+                                                    bg='white',
+                                                    padx=5
+                                                )
+
                 self.label_dict[(i, j)].grid(row=i + 1, column=j, sticky='nsew')
 
         self.tableFrame.pack(fill='x', padx=10)
