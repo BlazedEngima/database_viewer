@@ -8,8 +8,9 @@ class MainForm:
         self.uiList = uiList
         self.window = window
         self.headers = ['NO', 'ID', 'NAME', 'BIRTHDAY', 'AGE']
-        self.width = [10, 15, 25, 20, 30]
+        self.width = [5, 15, 25, 20, 30]
         self.button_icon = ['|<', '<<', '<', '>', '>>', '>|']
+        self.data_alignment = ['e', 'w', 'w', 'center', 'center']
     
     def add_employee(self, employeeData):
         self.employeeList.append(employeeData)
@@ -45,13 +46,13 @@ class MainForm:
         tableFrame = tk.Frame(self.window)
         
         for col, header in enumerate(self.headers):
-            label = tk.Label(tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10))
+            label = tk.Label(tableFrame, text=header, borderwidth=1, width=self.width[col], relief="solid", font=('Arial bold', 10), padx=5)
             label.grid(row=0, column=col)
         
         for i in range(rows):
             for j in range(cols):
-                entry = tk.Label(tableFrame, text=test_data[i][j], borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10))
-                entry.grid(row=i + 1, column=j, sticky="nsew")
+                entry = tk.Label(tableFrame, text=test_data[i][j], borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                entry.grid(row=i + 1, column=j, sticky='nsew')
         
         tableFrame.pack(fill='x', padx=10)
 
