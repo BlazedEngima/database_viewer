@@ -44,16 +44,18 @@ class MainForm:
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
-                entry = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
-                entry.grid(row=i + 1, column=j, sticky='nsew')
+                self.label_dict[(i, j)] = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                self.label_dict[(i, j)].grid(row=i + 1, column=j, sticky='nsew')
 
         self.tableFrame.pack(fill='x', padx=10)
 
     def _update(self):
-
         
-        self.tableFrame.pack(fill='x', padx=10)
-
+        for i in range(self.rows):
+            for j in range(self.cols):
+                text_val = self._get_column_data(i, j)
+                self.label_dict[(i, j)]['text'] = text_val
+                
     def _get_column_data(self, i, j):
         if j == 0:
             return str(self.start_p + i + 1)
@@ -70,13 +72,11 @@ class MainForm:
         if self.start_p + value <= 0:
             self.start_p = 0
 
-        elif self.start_p + value >= len(self.employeeList):
-            self.start_p = len(self.employeeList) - 1 - 5
+        elif self.start_p + value + 5 >= len(self.employeeList):
+            self.start_p = len(self.employeeList) - 5
         
         else:
             self.start_p += value
-
-        # print(f'start: {self.start_p} value: {value}')
 
     def _button_function(self, value):
         self._move_pointer(value=value)
