@@ -6,7 +6,7 @@ class MainForm:
     # Constructor of Main Form
     def __init__(self, window=None, tableFrame=None, buttonFrame=None, employeeList=[], start_p=0):
         # Widget frames and data to be displayed
-        self.dtmToday = date.today()
+        self.dtmToday = date(2023, 4, 12)
         self.employeeList = employeeList
         self.start_p = start_p # Starting pointer to where the current display is on the employeeList
         self.window = window
@@ -146,7 +146,7 @@ class MainForm:
     def add(self, employeeData):
         self.employeeList.append(employeeData)
 
-    # Initalize function for the main window
+    # Initialize function for the main window
     def win_initialize(self):
         self.window.geometry("840x240")
         self.window.title("Main")
@@ -154,7 +154,7 @@ class MainForm:
         curr_date = tk.Label(self.window, text=self.dtmToday, font=('Arial Bold', 10))
         curr_date.pack(padx=10, pady=10, anchor='w')
         
-    # Initalize function for the table and button UI 
+    # Initialize function for the table and button UI 
     def initialize_ui(self):
         self._init_tableFrame()
         self._init_buttonFrame()
