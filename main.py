@@ -1,7 +1,6 @@
 import tkinter as tk
 from datetime import date
 from dateutil import relativedelta
-from functools import partial
 
 
 class MainForm:
@@ -29,7 +28,7 @@ class MainForm:
             name = self.button_icon[i]
             distance = jump_distance[i]
 
-            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=partial(self._button_function, distance))
+            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=lambda distance=distance: self._button_function(value=distance))
             self.button_dict[name].grid(row=0, column=i)
         
         self.buttonFrame.pack(fill='x', padx=10, pady=20)
@@ -42,7 +41,7 @@ class MainForm:
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
-                self.label_dict[(i, j)] = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], padx=5)
+                self.label_dict[(i, j)] = tk.Label(self.tableFrame, text=text_val, borderwidth=1, width=self.width[j], relief="solid", font=('Arial', 10), anchor=self.data_alignment[j], bg='white', padx=5)
                 self.label_dict[(i, j)].grid(row=i + 1, column=j, sticky='nsew')
 
         self.tableFrame.pack(fill='x', padx=10)
@@ -79,6 +78,21 @@ class MainForm:
         self._move_pointer(value=value)
         self._update()
 
+    def _widget_change(self, widget, color):
+        if type(widget) == tk.Button:
+            widget.config(fg = color)
+        elif type(widget) == tk.Label:
+            widget.config(bg = color)
+
+    def _init_bindings(self):
+        for button in self.button_dict.values():
+            button.bind('<Enter>', lambda event, widget=button, color='red': self._widget_change(widget=widget, color=color))
+            button.bind('<Leave>', lambda event, widget=button, color='black': self._widget_change(widget=widget, color=color))
+        
+        for label in self.label_dict.values():
+            label.bind('<Enter>', lambda event, widget=label, color='#D3D3D3': self._widget_change(widget=widget, color=color))
+            label.bind('<Leave>', lambda event, widget=label, color='white': self._widget_change(widget=widget, color=color))
+
     def add(self, employeeData):
         self.employeeList.append(employeeData)
 
@@ -92,6 +106,7 @@ class MainForm:
     def initialize_ui(self):
         self._init_tableFrame()
         self._init_buttonFrame()
+        self._init_bindings()
 
     def button_commands(self, value):
         self._move_pointer(value)
