@@ -1,6 +1,7 @@
 import tkinter as tk
 from datetime import date
 from dateutil import relativedelta
+from functools import partial
 
 
 class MainForm:
@@ -28,10 +29,7 @@ class MainForm:
             name = self.button_icon[i]
             distance = jump_distance[i]
 
-            def action(x = distance):
-                return self._button_function(x)
-
-            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=action)
+            self.button_dict[name] = tk.Button(self.buttonFrame, text=self.button_icon[i], width=5, font=('Arial bold', 10), command=partial(self._button_function, distance))
             self.button_dict[name].grid(row=0, column=i)
         
         self.buttonFrame.pack(fill='x', padx=10, pady=20)
@@ -50,7 +48,6 @@ class MainForm:
         self.tableFrame.pack(fill='x', padx=10)
 
     def _update(self):
-        
         for i in range(self.rows):
             for j in range(self.cols):
                 text_val = self._get_column_data(i, j)
